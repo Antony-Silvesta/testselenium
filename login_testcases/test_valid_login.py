@@ -9,8 +9,8 @@ import time
 @pytest.fixture(scope="module")
 def mongo_client():
     client = MongoClient("mongodb://127.0.0.1:27017/")  # Update this URI as necessary
-    db = client["sampleupload"]  # Use your actual database name
-    users_collection = db["users"]  # Use your actual collection name
+    db = client["logindb"]  # Use your actual database name
+    users_collection = db["login"]  # Use your actual collection name
     yield users_collection
     client.close()  # Close the MongoDB client connection
     print("MongoDB client connection closed.")
