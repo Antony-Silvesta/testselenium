@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 def get_db():
     """Set up MongoDB connection."""
     client = MongoClient("mongodb://localhost:27017/")  # Replace with your MongoDB URI
-    return client["logindb"]
+    return client["sampleupload"]
 
 def get_users_collection():
     """Get the user collection."""
     db = get_db()
-    return db["login"]  # Replace with the actual collection name
+    return db["users"]  # Replace with the actual collection name
 
 @pytest.fixture(scope="class")
 def setup_driver():
