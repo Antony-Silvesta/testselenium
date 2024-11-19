@@ -31,6 +31,17 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Check Docker version
+      run: docker --version
+
+    - name: Build Docker image
+      run: |
+        docker build -t my-selenium-app:latest .  # Build the Docker image
+
+    - name: Save Docker image
+      run: docker image save my-selenium-app:latest | xz -z -e -7 -T0 > selenium.xz
+
+
     - name: Wait for MongoDB to start
       run: |
         echo "Waiting for MongoDB to start..."
