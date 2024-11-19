@@ -25,7 +25,7 @@ def setup_mongodb():
         },
 
         {
-            "_id": "671f71988a76e1c09ab851f2",
+          
             "username": "",
             "first_name": "admin",
             "last_name": "admin",
@@ -41,7 +41,7 @@ def setup_mongodb():
             },
             "vec_2fa": None,
             "baseurl": "https://demo.filebrowser.org/login?redirect=/files/",
-            "is_valid": True,
+            "is_valid": False,
             "expected_error": "Wrong credentials",
             "createdAt": "2024-10-28T11:12:24.055Z"
         },
