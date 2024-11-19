@@ -1,4 +1,5 @@
 name: Selenium Tests
+
 on:
   push:
     branches: [main]
@@ -64,15 +65,21 @@ jobs:
         pytest --html=report.html --self-contained-html > pytest_test_results.log || exit 0
         cat pytest_test_results.log
 
-    
-
-    
+    - name: Check if tests passed or failed
+      run: |
+        if grep -q "FAILED" pytest_test_results.log; then
+          echo "Tests failed"
+          echo "TESTS_PASSED=false" >> $GITHUB_ENV
+        else
+          echo "Tests passed"
+          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+        fi
 
     - name: Archive Pytest Results
       uses: actions/upload-artifact@v3
       with:
-              name: pytest-results
-              path: pytest_test_results.log
+        name: pytest-results
+        path: pytest_test_results.log
 
     - name: Archive HTML Test Report
       uses: actions/upload-artifact@v3
