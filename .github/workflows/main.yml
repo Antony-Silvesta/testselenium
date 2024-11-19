@@ -1,80 +1,61 @@
+name: Selenium Tests
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
-
+    branches: [main]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     services:
       mongodb:
-        image: mongo:latest
-        options: --health-cmd="curl --fail http://localhost:27017 || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
+        image: mongo:4.4
         ports:
           - 27017:27017
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - name: Set up Node.js (example for Node.js project)
-      uses: actions/setup-node@v3
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        node-version: '14'
+        python-version: '3.8'
 
     - name: Install dependencies
-      run: npm install
-
-    - name: Check Docker version
-      run: docker --version
-
-    - name: Build Docker image
       run: |
-        docker build -t my-selenium-app:latest .  # Build the Docker image
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-    - name: Save Docker image
-      run: docker image save my-selenium-app:latest | xz -z -e -7 -T0 > selenium.xz
-
-    - name: Wait for MongoDB to start
+    - name: Set PYTHONPATH
       run: |
-        echo "Waiting for MongoDB to start..."
-        until mongo --host localhost --eval "db.runCommand({ connectionStatus: 1 })"; do
-          echo "MongoDB is not ready yet, retrying..."
-          sleep 5
+        echo "PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/testselenium/configfile" >> $GITHUB_ENV
+
+    - name: Set Environment Variables
+      run: |
+        echo "PYTHONPATH=$PWD/login_testcases/homeobjects:$PWD/testselenium/configfile/config.py" >> $GITHUB_ENV
+        echo "MONGO_URI=mongodb://127.0.0.1:27017/sampleupload" >> $GITHUB_ENV
+
+    - name: Wait for MongoDB to be ready
+      run: |
+        until nc -zv localhost 27017; do
+          echo "Waiting for MongoDB to start..."
+          sleep 1
         done
-        echo "MongoDB is up and running!"
-
-    - name: Run tests
-      run: npm test
-
-    - name: Archive test results
-      if: success() # Only upload if tests passed
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-logs
-        path: |
-          path/to/test-logs/*.log
-          path/to/test-reports/*.html
-
-    - name: Upload HTML reports (optional)
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: html-reports
-        path: path/to/test-reports/*.html
-
-    - name: Upload all logs (optional)
-      if: always() # Always upload logs
-      uses: actions/upload-artifact@v3
-      with:
-        name: logs
-        path: path/to/logs/*.log
-
-    - name: Clean up MongoDB service
-      if: always()
+        echo "MongoDB is ready"
+    - name: Configure MongoDB Test Data
       run: |
-        docker ps -q --filter "name=mongodb" | xargs docker stop
+        python configfile/config.py  # Adjust the path to your setup script if necessary
+    - name: Set up ChromeDriver and Chrome
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: 'latest'
+    - name: Run Selenium Tests
+      run: |
+        python -m unittest discover -s login_testcases -p "valid.py"
+
+
+
+
+
+
+
