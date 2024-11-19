@@ -1,5 +1,3 @@
-name: CI Workflow
-
 on:
   push:
     branches:
@@ -15,7 +13,7 @@ jobs:
     services:
       mongodb:
         image: mongo:latest
-        options: --health-cmd='curl --silent --fail http://localhost:27017 || exit 1' --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="curl --fail http://localhost:27017 || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
         ports:
           - 27017:27017
 
@@ -40,7 +38,6 @@ jobs:
 
     - name: Save Docker image
       run: docker image save my-selenium-app:latest | xz -z -e -7 -T0 > selenium.xz
-
 
     - name: Wait for MongoDB to start
       run: |
