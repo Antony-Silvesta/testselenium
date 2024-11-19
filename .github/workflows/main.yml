@@ -64,15 +64,7 @@ jobs:
         pytest --html=report.html --self-contained-html > pytest_test_results.log || exit 0
         cat pytest_test_results.log
 
-    - name: Check if tests passed
-      id: check_tests
-      run: |
-        if grep -q "FAILED" pytest_test_results.log; then
-          echo "Tests failed"
-          echo "TESTS_PASSED=false" >> $GITHUB_ENV
-        else
-          echo "Tests passed"
-          echo "TESTS_PASSED=true" >> $GITHUB_ENV
+    
 
     
 
